@@ -40,6 +40,7 @@ public class WebSecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -61,11 +62,12 @@ public class WebSecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        // Allow public access to the authentication and health check endpoints
+                        .requestMatchers("/api/auth/**", "/api/health").permitAll()
+                        // All other requests must be authenticated
                         .anyRequest().authenticated()
                 );
         
-        // Register our custom authentication provider
         http.authenticationProvider(authenticationProvider());
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -73,4 +75,3 @@ public class WebSecurityConfig {
         return http.build();
     }
 }
-
