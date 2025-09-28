@@ -1,0 +1,18 @@
+Ignore the build output directory, it will be created inside the container
+target/
+
+Ignore IDE-specific files and settings
+.idea/
+*.iml
+*.ipr
+*.iws
+
+Ignore Git version control files
+.git/
+.gitignore
+
+Ignore local log files
+*.log
+
+Ignore the Dockerfile itself, it's not part of the application code
+Dockerfile
