@@ -29,7 +29,7 @@ public class UserPrincipal implements UserDetails {
     public Long getId() {
         return user.getId();
     }
-    
+
     // --- NEW METHOD ---
     // (This is for the 'lastUpdatedBy' field we'll use later)
     public User getUser() {

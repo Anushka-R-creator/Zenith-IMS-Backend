@@ -1,6 +1,5 @@
 package com.zenith.ims.controller;
 
-import com.zenith.ims.dto.InventoryItemRequest; // <-- Import the new DTO
 import com.zenith.ims.model.InventoryItem;
 import com.zenith.ims.repository.InventoryItemRepository;
 import com.zenith.ims.security.UserPrincipal;
@@ -21,24 +20,35 @@ public class InventoryController {
         this.inventoryItemRepository = inventoryItemRepository;
     }
 
+    /**
+     * Gets all inventory items belonging to the currently logged-in user's company.
+     * This endpoint is automatically secured by Spring Security.
+     * @param userPrincipal The details of the authenticated user, injected by Spring.
+     * @return A list of inventory items.
+     */
     @GetMapping
     public ResponseEntity<List<InventoryItem>> getInventory(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        // Find all items that match the companyId of the logged-in user
         List<InventoryItem> items = inventoryItemRepository.findByCompanyId(userPrincipal.getCompanyId());
         return ResponseEntity.ok(items);
     }
+
+    /**
+     * Creates a new inventory item.
+     * The item is automatically associated with the logged-in user's company.
+     * @param userPrincipal The details of the authenticated user.
+     * @param item The new item details from the request body.
+     * @return The saved inventory item.
+     */
     @PostMapping
-    public ResponseEntity<InventoryItem> createItem(@AuthenticationPrincipal UserPrincipal userPrincipal, 
-                                                    @Valid @RequestBody InventoryItemRequest itemRequest) {
-        
-        // 1. Convert the DTO to our database entity
-        InventoryItem newItem = itemRequest.toInventoryItem();
+    public ResponseEntity<InventoryItem> createItem(@AuthenticationPrincipal UserPrincipal userPrincipal, @Valid @RequestBody InventoryItem item) {
+        // Set the companyId and user from the authenticated principal
+        item.setCompanyId(userPrincipal.getCompanyId());
 
-        // 2. Set the secure, server-side fields
-        newItem.setCompanyId(userPrincipal.getCompanyId());
-        newItem.setLastUpdatedBy(userPrincipal.getUser()); 
+        // Set the user who created/updated this item
+        item.setLastUpdatedBy(userPrincipal.getUser());
 
-        // 3. Save the complete and valid entity
-        InventoryItem savedItem = inventoryItemRepository.save(newItem);
+        InventoryItem savedItem = inventoryItemRepository.save(item);
         return ResponseEntity.ok(savedItem);
     }
 }

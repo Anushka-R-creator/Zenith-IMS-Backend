@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface InventoryItemRepository extends JpaRepository<InventoryItem, Long> {
-    
+
     // Spring Data JPA will automatically create a query for this method:
     // "SELECT * FROM inventory_items WHERE company_id = ?"
     List<InventoryItem> findByCompanyId(String companyId);
