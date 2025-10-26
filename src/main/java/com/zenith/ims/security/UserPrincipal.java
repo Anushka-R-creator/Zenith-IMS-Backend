@@ -1,93 +1,73 @@
 package com.zenith.ims.security;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zenith.ims.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+
 public class UserPrincipal implements UserDetails {
 
-    private final Long id;
+    private final User user;
 
-    private final String username;
-
-    @JsonIgnore 
-    private final String password;
-
-    private final Collection<? extends GrantedAuthority> authorities;
-
-    public UserPrincipal(Long id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.authorities = authorities;
+    public UserPrincipal(User user) {
+        this.user = user;
     }
+
     public static UserPrincipal create(User user) {
-        List<GrantedAuthority> authorities = Collections.singletonList(
-                new SimpleGrantedAuthority(user.getRole().name())
-        );
-
-        return new UserPrincipal(
-                user.getId(),
-                user.getUsername(),
-                user.getPassword(),
-                authorities
-        );
+        return new UserPrincipal(user);
     }
 
+    // --- NEW METHOD ---
+    public String getCompanyId() {
+        return user.getCompanyId();
+    }
+
+    // --- NEW METHOD ---
     public Long getId() {
-        return id;
+        return user.getId();
     }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
+    
+    // --- NEW METHOD ---
+    // (This is for the 'lastUpdatedBy' field we'll use later)
+    public User getUser() {
+        return user;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+        return Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()));
+    }
+
+    @Override
+    public String getPassword() {
+        return user.getPassword();
+    }
+
+    @Override
+    public String getUsername() {
+        return user.getUsername();
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true; 
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; 
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; 
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return true; 
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        UserPrincipal that = (UserPrincipal) o;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
+        return true;
     }
 }
